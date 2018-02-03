@@ -446,12 +446,12 @@ static NSString * AWSCognitoAuthAsfDeviceId = @"asf.device.id";
  */
 - (void)safariViewController:(SFSafariViewController *)controller didCompleteInitialLoad:(BOOL)didLoadSuccessfully {
     if(!didLoadSuccessfully){
-        NSError *error = [self getError:@"Loading page failed" code:AWSCognitoAuthClientErrorLoadingPageFailed];
-        if(self.getSessionBlock){
-            [self completeGetSession:nil error:error];
-        }else if(self.signOutBlock){
-            [self completeSignOut:error];
-        }
+ //       NSError *error = [self getError:@"Loading page failed" code:AWSCognitoAuthClientErrorLoadingPageFailed];
+ //       if(self.getSessionBlock){
+ //           [self completeGetSession:nil error:error];
+ //       }else if(self.signOutBlock){
+ //           [self completeSignOut:error];
+ //       }
     }
 }
 
@@ -610,7 +610,14 @@ static NSString * AWSCognitoAuthAsfDeviceId = @"asf.device.id";
     else if(result[@"error"]){
         //refresh token has expired, switch to interactive auth
         if([@"invalid_grant" isEqualToString:result[@"error"]]){
-            [self launchSignInVC:self.pvc];
+            if (!self.pvc)
+            {
+                [self completeGetSession:nil error:[self getError:result[@"error"] code:AWSCognitoAuthClientErrorUnknown]];
+            }
+            else
+            {
+                [self launchSignInVC:self.pvc];
+            }
             return;
         }
         
